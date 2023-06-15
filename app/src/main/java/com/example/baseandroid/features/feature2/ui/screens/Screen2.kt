@@ -1,3 +1,3 @@
 package com.example.baseandroid.features.feature2.ui.screens
 
-class Screen2 {}
+class Screen2

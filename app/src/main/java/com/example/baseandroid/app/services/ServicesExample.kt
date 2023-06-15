@@ -1,3 +1,3 @@
 package com.example.baseandroid.app.services
 
-class ServicesExample {}
+class ServicesExample
