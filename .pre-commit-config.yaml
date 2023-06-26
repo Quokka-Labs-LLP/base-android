@@ -1,4 +1,4 @@
-exclude: '.name'
+exclude: '.name|.gradle/*'
 repos:
   -   repo: https://github.com/pre-commit/pre-commit-hooks
       rev: v3.2.0
@@ -18,7 +18,7 @@ repos:
   -   repo: https://github.com/dustinsand/pre-commit-jvm
       rev: v0.7.0
       hooks:
-#        -   id: detekt
-#            args: [ --config, detekt-config.yml ]
-        -   id: ktlint
-            args: [ --format ]
+        -   id: detekt
+            args: [ --config, detekt-config.yml ]
+#        -   id: ktlint
+#            args: [ --format ]
