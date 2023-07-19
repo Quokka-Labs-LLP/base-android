@@ -1,27 +1,27 @@
 package com.example.baseandroid.utils
 
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import java.util.*
 
-object StringUtils {
-    private fun isNullOrEmpty(text: String?): Boolean {
-        return text == null || text.isEmpty()
-    }
 
-    fun capitalizeFirstLetter(text: String): String {
-        if (isNullOrEmpty(text)) {
-            return text
-        }
-        return text.substring(0, 1).uppercase(Locale.ROOT) + text.substring(1)
+fun String.capitalizeFirstLetter(): String {
+    if (this.isNullOrEmpty()) {
+        return this
     }
+    return this.substring(0, 1).uppercase(Locale.ROOT) + this.substring(1)
+}
 
-    fun stripHtmlTags(html: String): String {
-        return html.replace(Regex("<.*?>"), "")
-    }
+fun String.stripHtmlTags(): String {
+    return this.replace(Regex("<.*?>"), "")
+}
 
-    fun truncate(text: String, maxLength: Int): String {
-        if (text.length <= maxLength) {
-            return text
-        }
-        return text.substring(0, maxLength) + "..."
+fun String.truncate(maxLength: Int): String {
+    if (this.length <= maxLength) {
+        return this
     }
+    return this.substring(0, maxLength) + "..."
 }
