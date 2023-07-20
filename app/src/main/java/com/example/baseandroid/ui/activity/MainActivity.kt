@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setAdapter(userList:List<UserResponse>) {
         binding.recyclerview.apply {
-            adapter = UserAdapter(userList)
+            adapter = UserAdapter(userList,this@MainActivity)
             layoutManager = LinearLayoutManager(this@MainActivity)
             setHasFixedSize(true)
         }

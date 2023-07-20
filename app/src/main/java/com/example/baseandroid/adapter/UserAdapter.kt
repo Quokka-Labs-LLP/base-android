@@ -1,15 +1,20 @@
 package com.example.baseandroid.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.baseandroid.R
 import com.example.baseandroid.adapter.UserAdapter.*
 import com.example.baseandroid.model.UserResponse
 
-class UserAdapter(private val userList:List<UserResponse>):RecyclerView.Adapter<ViewHolder>() {
+class UserAdapter(private val userList: List<UserResponse>, private val context: Context) :
+    RecyclerView.Adapter<ViewHolder>() {
     //create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         // inflates the card_view_design view
@@ -24,6 +29,10 @@ class UserAdapter(private val userList:List<UserResponse>):RecyclerView.Adapter<
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.title.text = userList[position].title
         holder.body.text = userList[position].body
+        Glide.with(context)
+            .load("your_image_url")
+            .apply(RequestOptions().placeholder(R.drawable.ic_placeholder))
+            .into(holder.photo)
 
     }
 
@@ -33,9 +42,10 @@ class UserAdapter(private val userList:List<UserResponse>):RecyclerView.Adapter<
     }
 
     // Holds the views for adding text
-    class ViewHolder(ItemView:View):RecyclerView.ViewHolder(ItemView){
+    class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
         val title: TextView = itemView.findViewById(R.id.tvTitle)
         val body: TextView = itemView.findViewById(R.id.tvBody)
+        val photo: ImageView = itemView.findViewById(R.id.ivPhoto)
 
     }
 
