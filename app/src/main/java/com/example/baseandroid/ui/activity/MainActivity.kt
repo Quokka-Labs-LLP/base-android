@@ -1,4 +1,4 @@
-package com.example.baseandroid
+package com.example.baseandroid.ui.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.baseandroid.R
 import com.example.baseandroid.adapter.UserAdapter
 import com.example.baseandroid.databinding.ActivityMainBinding
 import com.example.baseandroid.model.UserResponse
