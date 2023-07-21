@@ -4,13 +4,14 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.telephony.TelephonyManager
+import com.example.baseandroid.app.MyApp
 import java.net.InetAddress
 import java.net.NetworkInterface
 
 object NetworkUtils {
     /*check is user device connected to internet*/
-    fun isNetworkAvailable(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    fun isNetworkAvailable(): Boolean {
+        val connectivityManager = MyApp.getInstance()?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
 
@@ -18,8 +19,8 @@ object NetworkUtils {
     }
 
     /*check is user device connected to wifi*/
-    fun isWifiConnected(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    fun isWifiConnected(): Boolean {
+        val connectivityManager = MyApp.getInstance()?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
 
@@ -27,8 +28,8 @@ object NetworkUtils {
     }
 
     /*check is user device connected to mobile data*/
-    fun isMobileDataConnected(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    fun isMobileDataConnected(): Boolean {
+        val connectivityManager = MyApp.getInstance()?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
 
@@ -36,8 +37,8 @@ object NetworkUtils {
     }
 
     /*check is user device is in Roaming*/
-    fun isRoaming(context: Context): Boolean {
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+    fun isRoaming(): Boolean {
+        val telephonyManager = MyApp.getInstance()?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         return telephonyManager.isNetworkRoaming
     }
 
