@@ -1,19 +1,15 @@
-package com.example.baseandroid.adapter
+package com.example.baseandroid.features.main.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.baseandroid.R
-import com.example.baseandroid.adapter.UserAdapter.*
-import com.example.baseandroid.databinding.ActivityMainBinding
 import com.example.baseandroid.databinding.CardViewDesignBinding
-import com.example.baseandroid.model.UserResponse
+import com.example.baseandroid.features.main.adapter.UserAdapter.ViewHolder
+import com.example.baseandroid.features.main.models.UserResponse
 
 class UserAdapter(private val context: Context) : RecyclerView.Adapter<ViewHolder>() {
     private var userList = listOf<UserResponse>()

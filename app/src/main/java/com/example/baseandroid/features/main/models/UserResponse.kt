@@ -1,4 +1,4 @@
-package com.example.baseandroid.model
+package com.example.baseandroid.features.main.models
 
 import com.google.gson.annotations.SerializedName
 
