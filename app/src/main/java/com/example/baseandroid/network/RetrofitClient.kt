@@ -10,9 +10,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient {
     fun getInstance(): Retrofit {
         val mHttpLoggingInterceptor = HttpLoggingInterceptor()
-        if (BuildConfig.DEBUG)
+        if (BuildConfig.DEBUG) {
             mHttpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-        else
+        } else
             mHttpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC)
 
         val mOkHttpClient = OkHttpClient

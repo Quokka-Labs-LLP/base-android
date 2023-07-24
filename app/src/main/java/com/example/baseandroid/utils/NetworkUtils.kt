@@ -11,7 +11,9 @@ import java.net.NetworkInterface
 object NetworkUtils {
     /*check is user device connected to internet*/
     fun isNetworkAvailable(): Boolean {
-        val connectivityManager = MyApp.getInstance()?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager = MyApp.getInstance()?.getSystemService(
+            Context.CONNECTIVITY_SERVICE,
+        ) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
 
@@ -20,7 +22,9 @@ object NetworkUtils {
 
     /*check is user device connected to wifi*/
     fun isWifiConnected(): Boolean {
-        val connectivityManager = MyApp.getInstance()?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager = MyApp.getInstance()?.getSystemService(
+            Context.CONNECTIVITY_SERVICE,
+        ) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
 
@@ -29,7 +33,9 @@ object NetworkUtils {
 
     /*check is user device connected to mobile data*/
     fun isMobileDataConnected(): Boolean {
-        val connectivityManager = MyApp.getInstance()?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager = MyApp.getInstance()?.getSystemService(
+            Context.CONNECTIVITY_SERVICE,
+        ) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
 

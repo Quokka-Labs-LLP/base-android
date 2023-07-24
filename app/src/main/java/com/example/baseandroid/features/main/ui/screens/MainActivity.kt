@@ -1,25 +1,17 @@
-package com.example.baseandroid.ui.activity
+package com.example.baseandroid.features.main.ui.screens
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.baseandroid.R
-import com.example.baseandroid.adapter.UserAdapter
 import com.example.baseandroid.databinding.ActivityMainBinding
-import com.example.baseandroid.factory.MainViewModelFactory
-import com.example.baseandroid.model.UserResponse
+import com.example.baseandroid.features.main.adapter.UserAdapter
+import com.example.baseandroid.features.main.factory.MainViewModelFactory
+import com.example.baseandroid.features.main.repository.MainRepository
+import com.example.baseandroid.features.main.viewmodel.MainViewModel
 import com.example.baseandroid.network.ApiInterface
 import com.example.baseandroid.network.RetrofitClient
-import com.example.baseandroid.repository.MainRepository
-import com.example.baseandroid.utils.NetworkUtils.isNetworkAvailable
-import com.example.baseandroid.utils.NetworkUtils.isWifiConnected
-import com.example.baseandroid.viewmodel.MainViewModel
-import kotlinx.coroutines.launch
-import retrofit2.Retrofit
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -41,8 +33,13 @@ class MainActivity : AppCompatActivity() {
             setHasFixedSize(true)
         }
         apiInterface = RetrofitClient.getInstance().create(ApiInterface::class.java)
-        viewModel = ViewModelProvider(this,MainViewModelFactory(MainRepository
-            (apiInterface)))[MainViewModel::class.java]
+        viewModel = ViewModelProvider(
+            this,
+            MainViewModelFactory(
+                MainRepository
+                (apiInterface),
+            ),
+        )[MainViewModel::class.java]
     }
 
     private fun callUserApi() {
@@ -52,13 +49,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeUserData() {
         viewModel.allUserData.observe(this) {
-            if (it.isNotEmpty())
+            if (it.isNotEmpty()) {
                 userAdapter.setUserList(it)
-
+            }
         }
         viewModel.errorMessage.observe(this) {
-            if (!it.isNullOrEmpty())
+            if (!it.isNullOrEmpty()) {
                 Toast.makeText(this, it.toString(), Toast.LENGTH_LONG).show()
+            }
         }
     }
 }

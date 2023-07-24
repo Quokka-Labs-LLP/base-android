@@ -2,7 +2,6 @@ package com.example.baseandroid.app
 
 import android.app.Application
 
-
 class MyApp : Application() {
     override fun onCreate() {
         super.onCreate()
@@ -14,14 +13,13 @@ class MyApp : Application() {
         fun getInstance(): MyApp? {
             if (instance == null) {
                 synchronized(MyApp::class.java) {
-                    if (instance == null) instance =
-                        MyApp()
+                    if (instance == null) {
+                        instance =
+                            MyApp()
+                    }
                 }
             }
             return instance
         }
-
     }
-
-
 }

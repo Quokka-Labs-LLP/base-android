@@ -1,14 +1,14 @@
-package com.example.baseandroid.model
+package com.example.baseandroid.features.main.models
 
 import com.google.gson.annotations.SerializedName
 
 data class UserResponse(
     @SerializedName("userId")
-    val userId :Int?,
+    val userId: Int?,
     @SerializedName("id")
-    val id:Int?,
+    val id: Int?,
     @SerializedName("title")
-    val title:String?,
+    val title: String?,
     @SerializedName("body")
-    val body:String?
+    val body: String?,
 )
