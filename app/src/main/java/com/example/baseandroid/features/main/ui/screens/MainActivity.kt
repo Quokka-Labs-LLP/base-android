@@ -3,20 +3,18 @@ package com.example.baseandroid.features.main.ui.screens
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.baseandroid.R
 import com.example.baseandroid.databinding.ActivityMainBinding
 import com.example.baseandroid.features.main.adapter.UserAdapter
-import com.example.baseandroid.features.main.factory.MainViewModelFactory
-import com.example.baseandroid.features.main.repository.MainRepository
 import com.example.baseandroid.features.main.viewmodel.MainViewModel
-import com.example.baseandroid.network.ApiInterface
-import com.example.baseandroid.network.RetrofitClient
+import com.example.baseandroid.utils.NetworkResult
+import com.example.baseandroid.utils.NetworkUtils.isNetworkAvailable
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var viewModel: MainViewModel
-    private lateinit var apiInterface: ApiInterface
+    private val mainViewModel by viewModel<MainViewModel>()
     private val userAdapter = UserAdapter(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,31 +30,27 @@ class MainActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@MainActivity)
             setHasFixedSize(true)
         }
-        apiInterface = RetrofitClient.getInstance().create(ApiInterface::class.java)
-        viewModel = ViewModelProvider(
-            this,
-            MainViewModelFactory(
-                MainRepository
-                (apiInterface),
-            ),
-        )[MainViewModel::class.java]
     }
 
     private fun callUserApi() {
-        viewModel.getAllUsers()
-        observeUserData()
-    }
-
-    private fun observeUserData() {
-        viewModel.allUserData.observe(this) {
-            if (it.isNotEmpty()) {
-                userAdapter.setUserList(it)
+        if (isNetworkAvailable()) {
+            mainViewModel.fetchAllUsers()
+            mainViewModel.allUserData.observe(this) { response ->
+                when (response) {
+                    is NetworkResult.Success -> {
+                        // bind data to the view
+                        response.data?.let { userAdapter.setUserList(it) }
+                    }
+                    is NetworkResult.Error -> {
+                        // show error message
+                        Toast.makeText(this, response.message, Toast.LENGTH_LONG).show()
+                    }
+                    is NetworkResult.Loading -> {
+                        // show a progress bar
+                    }
+                }
             }
-        }
-        viewModel.errorMessage.observe(this) {
-            if (!it.isNullOrEmpty()) {
-                Toast.makeText(this, it.toString(), Toast.LENGTH_LONG).show()
-            }
-        }
+        } else
+            Toast.makeText(this, getString(R.string.check_internet), Toast.LENGTH_LONG).show()
     }
 }
