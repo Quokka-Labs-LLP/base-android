@@ -13,7 +13,9 @@ repos:
       hooks:
         -   id: pretty-format-java
             args: [--autofix]
-
+        -   id: pretty-format-kotlin
+            args: [--autofix]
+            exclude: '^Module.kt'
   -   repo: https://github.com/dustinsand/pre-commit-jvm
       rev: v0.7.0
       hooks:
