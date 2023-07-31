@@ -1,5 +1,6 @@
 package com.example.baseandroid.features.main.ui.screens
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -8,6 +9,7 @@ import com.example.baseandroid.R
 import com.example.baseandroid.databinding.ActivityMainBinding
 import com.example.baseandroid.features.main.adapter.UserAdapter
 import com.example.baseandroid.features.main.viewmodel.MainViewModel
+import com.example.baseandroid.features.setting.ui.screens.SettingActivity
 import com.example.baseandroid.utils.NetworkResult
 import com.example.baseandroid.utils.NetworkUtils.isNetworkAvailable
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -20,8 +22,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        appBarNavigation()
         initComponents()
         callUserApi()
+    }
+
+    private fun appBarNavigation() {
+        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.setting -> {
+                    startActivity(Intent(this, SettingActivity::class.java))
+                    true
+                }
+                else -> {
+                    false
+                }
+            }
+        }
     }
 
     private fun initComponents() {
