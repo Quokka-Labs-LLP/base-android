@@ -1,5 +1,7 @@
 package com.example.baseandroid.di
 
+import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.example.baseandroid.features.main.repository.MainRepository
 import com.example.baseandroid.features.main.viewmodel.MainViewModel
 import com.example.baseandroid.network.ApiInterface
@@ -38,9 +40,10 @@ val retrofitModule = module {
         return GsonConverterFactory.create()
     }
 
-    fun provideHttpClient(): OkHttpClient {
+    fun provideHttpClient(context: Context): OkHttpClient {
         return OkHttpClient
             .Builder()
+            .addInterceptor(ChuckerInterceptor(context))
             .readTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
             .connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
             .build()
@@ -55,6 +58,6 @@ val retrofitModule = module {
     }
 
     single { provideGsonConverterFactory() }
-    single { provideHttpClient() }
+    single { provideHttpClient(get()) }
     single { provideRetrofit(get(), get()) }
 }
