@@ -17,10 +17,10 @@
         android:theme="@style/Theme.BaseAndroid"
         tools:targetApi="31">
         <activity
-            android:name=".features.main.ui.screens.MainActivity"
+            android:name=".features.main.MainActivity"
             android:exported="true"
             android:label="@string/title_activity_main"
-            android:theme="@style/Theme.BaseAndroid.NoActionBar">
+            android:theme="@style/Theme.BaseAndroid">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
