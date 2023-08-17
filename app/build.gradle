@@ -5,16 +5,19 @@ plugins {
 
 android {
     namespace 'com.example.baseandroid'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.baseandroid"
         minSdk 24
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
     }
 
     buildTypes {
@@ -32,41 +35,59 @@ android {
     }
     buildFeatures {
         viewBinding true
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.4.6'
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
     }
 }
 
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.fragment:fragment-ktx:1.6.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.activity:activity-compose:1.7.2'
+    implementation platform('androidx.compose:compose-bom:2023.03.00')
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.ui:ui-graphics'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'androidx.compose.material3:material3'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     //ViewModel and livedata
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:2.7.0-alpha01"
+    implementation "androidx.compose.runtime:runtime-livedata:1.5.0"
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.1"
     //retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     //GSON
-    implementation 'com.google.code.gson:gson:2.10'
+    implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.9'
     //coroutine
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-    // for adding recyclerview
-    implementation 'androidx.recyclerview:recyclerview:1.3.0'
-    // for adding cardview
-    implementation 'androidx.cardview:cardview:1.0.0'
-    //Glide
-    implementation 'com.github.bumptech.glide:glide:4.15.0'
+    //Glide for compose
+    implementation "com.github.bumptech.glide:compose:1.0.0-alpha.1"
     //koin
-    implementation 'io.insert-koin:koin-android-compat:3.4.2'
+    implementation "io.insert-koin:koin-androidx-compose:3.4.0"
+    //others
+    androidTestImplementation platform('androidx.compose:compose-bom:2023.03.00')
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     //api-logger chucker
     debugImplementation "com.github.chuckerteam.chucker:library:4.0.0"
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+    debugImplementation 'androidx.compose.ui:ui-test-manifest'
     releaseImplementation "com.github.chuckerteam.chucker:library-no-op:4.0.0"
 }
