@@ -19,14 +19,17 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import com.example.baseandroid.features.main.models.UserResponse
 import com.example.baseandroid.features.main.ui.components.AdapterItem
+import com.example.baseandroid.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(modifier: Modifier, userList: List<UserResponse>, launchSettings: () -> Unit) {
+fun HomeScreen(modifier: Modifier, userList: List<UserResponse>, navController: NavController) {
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-        TopAppBar(colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+        TopAppBar(
+            colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
             title = {
                 Row(
                     modifier = modifier,
@@ -34,7 +37,9 @@ fun HomeScreen(modifier: Modifier, userList: List<UserResponse>, launchSettings:
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text("Compose-Koin")
-                    IconButton(onClick = { launchSettings() }) {
+                    IconButton(onClick = {
+                        navController.navigate(route = Screen.Setting.route)
+                    }) {
                         Icon(
                             imageVector = Icons.Outlined.Settings, contentDescription = "settings"
                         )
@@ -42,6 +47,7 @@ fun HomeScreen(modifier: Modifier, userList: List<UserResponse>, launchSettings:
                 }
             })
     }) {
+
         Surface(
             modifier = Modifier
                 .fillMaxSize()

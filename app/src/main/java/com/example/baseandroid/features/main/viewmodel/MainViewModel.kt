@@ -1,6 +1,5 @@
 package com.example.baseandroid.features.main.viewmodel
 
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,10 +11,8 @@ import kotlinx.coroutines.launch
 
 class MainViewModel constructor(private val repository: MainRepository) : ViewModel() {
 
-
     private val _allUserData: MutableLiveData<NetworkResult<List<UserResponse>>> = MutableLiveData()
     val allUserData: LiveData<NetworkResult<List<UserResponse>>> = _allUserData
-    val currentPage = mutableIntStateOf(0) // 0 for HomeScreen, 1 for SettingsScreen
 
     fun fetchAllUsers() = viewModelScope.launch {
         repository.getAllUsers().collect { values ->

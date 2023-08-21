@@ -19,14 +19,18 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.baseandroid.features.main.viewmodel.MainViewModel
+import androidx.navigation.NavController
+import com.chuckerteam.chucker.api.Chucker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(modifier: Modifier, viewModel: MainViewModel, onLaunchChucker: () -> Unit) {
+fun SettingsScreen(modifier: Modifier, navController: NavController) {
+    val context = LocalContext.current
     Scaffold(modifier = modifier, topBar = {
-        TopAppBar(colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+        TopAppBar(
+            colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
             title = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -36,7 +40,9 @@ fun SettingsScreen(modifier: Modifier, viewModel: MainViewModel, onLaunchChucker
                     Text(
                         text = "Compose-Koin-Settings"
                     )
-                    IconButton(onClick = { viewModel.currentPage.intValue = 0 }) {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
                         Icon(
                             imageVector = Icons.Outlined.ArrowBack, contentDescription = "back"
                         )
@@ -49,7 +55,7 @@ fun SettingsScreen(modifier: Modifier, viewModel: MainViewModel, onLaunchChucker
         ) {
             Button(
                 onClick = {
-                    onLaunchChucker()
+                    context.startActivity(Chucker.getLaunchIntent(context))
                 }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(5.dp)
