@@ -1,8 +1,9 @@
 package com.example.baseandroid.utils
 
 import retrofit2.Response
+import java.io.IOException
 
-abstract class BaseApiResponse {
+open class BaseApiResponse {
     suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): NetworkResult<T> {
         try {
             val response = apiCall()
@@ -13,10 +14,11 @@ abstract class BaseApiResponse {
                 }
             }
             return error("${response.code()} ${response.message()}")
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             return error(e.message ?: e.toString())
         }
     }
+
     private fun <T> error(errorMessage: String): NetworkResult<T> =
         NetworkResult.Error("Api call failed $errorMessage")
 }

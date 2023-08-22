@@ -2,11 +2,8 @@ package com.example.baseandroid.utils
 
 import android.app.Activity
 import android.content.Context
-import android.content.pm.PackageManager
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 
 object CommonUtils {
     fun hideKeyboard(activity: Activity) {

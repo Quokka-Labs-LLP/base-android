@@ -1,5 +1,6 @@
 package com.example.baseandroid.features.main.ui.screens
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -9,6 +10,7 @@ import com.example.baseandroid.R
 import com.example.baseandroid.databinding.ActivityMainBinding
 import com.example.baseandroid.features.main.adapter.UserAdapter
 import com.example.baseandroid.features.main.viewmodel.MainViewModel
+import com.example.baseandroid.features.setting.ui.screens.SettingActivity
 import com.example.baseandroid.utils.NetworkResult
 import com.example.baseandroid.utils.NetworkUtils.isNetworkAvailable
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,8 +24,24 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        appBarNavigation()
         initComponents()
         callUserApi()
+    }
+
+    private fun appBarNavigation() {
+        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.setting -> {
+                    startActivity(Intent(this, SettingActivity::class.java))
+                    true
+                }
+
+                else -> {
+                    false
+                }
+            }
+        }
     }
 
     private fun initComponents() {
@@ -39,15 +57,17 @@ class MainActivity : AppCompatActivity() {
             mainViewModel.fetchAllUsers()
             mainViewModel.allUserData.observe(this) { response ->
                 when (response) {
-                    is NetworkResult.Success -> {
+                    is NetworkResult.Success<*> -> {
                         // bind data to the view
                         response.data?.let { userAdapter.setUserList(it) }
                     }
-                    is NetworkResult.Error -> {
+
+                    is NetworkResult.Error<*> -> {
                         // show error message
                         Toast.makeText(this, response.message, Toast.LENGTH_LONG).show()
                     }
-                    is NetworkResult.Loading -> {
+
+                    is NetworkResult.Loading<*> -> {
                         //show a progress bar
                     }
 

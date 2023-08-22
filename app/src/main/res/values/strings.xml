@@ -11,4 +11,7 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="check_internet">Please check your Internet.</string>
     <string name="item">Item</string>
+    <string name="api_logger">Api Logger</string>
+    <string name="setting">Setting</string>
+
 </resources>
