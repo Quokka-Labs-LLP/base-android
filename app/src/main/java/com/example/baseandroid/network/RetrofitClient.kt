@@ -1,5 +1,7 @@
 package com.example.baseandroid.network
 
+import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.example.baseandroid.BuildConfig
 import com.example.baseandroid.utils.BASE_URL
 import okhttp3.OkHttpClient
@@ -8,7 +10,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    fun getInstance(): Retrofit {
+    fun getInstance(context : Context): Retrofit {
         val mHttpLoggingInterceptor = HttpLoggingInterceptor()
         if (BuildConfig.DEBUG) {
             mHttpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -17,6 +19,7 @@ object RetrofitClient {
 
         val mOkHttpClient = OkHttpClient
             .Builder()
+            .addInterceptor(ChuckerInterceptor(context))
             .addInterceptor(mHttpLoggingInterceptor)
             .build()
 
