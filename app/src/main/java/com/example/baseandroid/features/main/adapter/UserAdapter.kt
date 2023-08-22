@@ -13,11 +13,12 @@ import com.example.baseandroid.features.main.models.UserResponse
 
 class UserAdapter(private val context: Context) : RecyclerView.Adapter<ViewHolder>() {
     private var userList = listOf<UserResponse>()
-    fun setUserList(userList : List<UserResponse>){
+    fun setUserList(userList: List<UserResponse>) {
         this.userList = userList
         notifyDataSetChanged()
     }
-    //create new views
+
+    // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         // inflates the card_view_design view
         // that is used to hold list item
@@ -34,7 +35,6 @@ class UserAdapter(private val context: Context) : RecyclerView.Adapter<ViewHolde
             .load("your_image_url")
             .apply(RequestOptions().placeholder(R.drawable.ic_placeholder))
             .into(holder.binding.ivPhoto)
-
     }
 
     // return the number of the items in the list
@@ -44,5 +44,4 @@ class UserAdapter(private val context: Context) : RecyclerView.Adapter<ViewHolde
 
     // Holds the views for adding text
     class ViewHolder(val binding: CardViewDesignBinding) : RecyclerView.ViewHolder(binding.root)
-
 }
