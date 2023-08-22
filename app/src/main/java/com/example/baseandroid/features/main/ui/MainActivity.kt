@@ -11,7 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.baseandroid.R
 import com.example.baseandroid.features.main.models.UserResponse
-import com.example.baseandroid.features.main.ui.ui.theme.BaseAndroidTheme
+import com.example.baseandroid.features.main.ui.theme.BaseAndroidTheme
 import com.example.baseandroid.features.main.viewmodel.MainViewModel
 import com.example.baseandroid.navigation.SetNavGraph
 import com.example.baseandroid.utils.NetworkResult

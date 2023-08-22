@@ -19,6 +19,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.baseandroid.features.main.models.UserResponse
 import com.example.baseandroid.features.main.ui.components.AdapterItem
@@ -32,11 +33,9 @@ fun HomeScreen(modifier: Modifier, userList: List<UserResponse>, navController: 
             colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
             title = {
                 Row(
-                    modifier = modifier,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Compose-Koin")
                     IconButton(onClick = {
                         navController.navigate(route = Screen.Setting.route)
                     }) {
@@ -44,6 +43,7 @@ fun HomeScreen(modifier: Modifier, userList: List<UserResponse>, navController: 
                             imageVector = Icons.Outlined.Settings, contentDescription = "settings"
                         )
                     }
+                    Text("Compose-Koin", modifier = Modifier.padding(start = 10.dp))
                 }
             })
     }) {

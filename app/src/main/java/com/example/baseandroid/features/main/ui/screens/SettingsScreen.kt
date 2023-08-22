@@ -33,13 +33,9 @@ fun SettingsScreen(modifier: Modifier, navController: NavController) {
             colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
             title = {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Compose-Koin-Settings"
-                    )
                     IconButton(onClick = {
                         navController.popBackStack()
                     }) {
@@ -47,6 +43,9 @@ fun SettingsScreen(modifier: Modifier, navController: NavController) {
                             imageVector = Icons.Outlined.ArrowBack, contentDescription = "back"
                         )
                     }
+                    Text(
+                        text = "Compose-Koin-Settings", modifier = Modifier.padding(start = 10.dp)
+                    )
                 }
             })
     }) {
