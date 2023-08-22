@@ -87,6 +87,11 @@ dependencies {
     //Dagger - Hilt
     implementation 'com.google.dagger:hilt-android:2.44'
     kapt 'com.google.dagger:hilt-android-compiler:2.44'
+    //api-logger chucker
+    debugImplementation "com.github.chuckerteam.chucker:library:4.0.0"
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+    debugImplementation 'androidx.compose.ui:ui-test-manifest'
+    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:4.0.0"
     //others
     androidTestImplementation platform('androidx.compose:compose-bom:2023.03.00')
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
