@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.chuckerteam.chucker.api.Chucker
 import com.example.baseandroid.databinding.ActivitySettingBinding
-import com.example.baseandroid.features.LogViewerActivity
+import com.example.baseandroid.features.logviewer.ui.LogViewerActivity
 
 class SettingActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingBinding

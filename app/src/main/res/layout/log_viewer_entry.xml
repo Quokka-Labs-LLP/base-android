@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceBodySmall"
         android:textColor="?android:attr/textColorPrimary"
-        android:textSize="11sp"
+        android:textSize="12sp"
         tools:text="Fri Mar 13 10:17:37 GMT+05:30 2020" />
 
     <com.google.android.material.textview.MaterialTextView
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceBodySmall"
         android:textColor="?android:attr/textColorPrimary"
-        android:textSize="11sp"
+        android:textSize="12sp"
         tools:text="FATAL EXCEPTION: Thread-2" />
 
 </LinearLayout>

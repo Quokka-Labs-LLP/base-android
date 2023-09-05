@@ -1,4 +1,4 @@
-package com.example.baseandroid.features
+package com.example.baseandroid.features.logviewer.ui
 
 import android.content.ClipDescription.compareMimeTypes
 import android.content.ContentProvider
@@ -30,6 +30,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.baseandroid.R
 import com.example.baseandroid.databinding.ActivityLogViewerBinding
+import com.example.baseandroid.features.logviewer.adapter.SpinnerAdapter
+import com.example.baseandroid.features.logviewer.model.SpinnerModel
 import com.example.baseandroid.utils.logviewer.DownloadsFileSaver
 import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.Dispatchers
@@ -134,6 +136,48 @@ class LogViewerActivity : AppCompatActivity() {
 
             }
         }
+        configureSpinners()
+    }
+
+    private fun configureSpinners() {
+
+        // For user generated or system generated Logs
+        val userTags = applicationContext.resources.getStringArray(R.array.logs_user)
+        val userCategoryList: ArrayList<SpinnerModel> = ArrayList()
+        for (user in userTags) {
+            val categoryModel = SpinnerModel()
+            categoryModel.setTitle(user)
+            categoryModel.setSelected(true)
+//            logsToShow.add(user)
+            userCategoryList.add(categoryModel)
+        }
+        val userAdapter = SpinnerAdapter(this@LogViewerActivity, userCategoryList) { position ->
+            val tag: String = userTags[position - 1]
+//            if (logsToShow.contains(tag)) logsToShow.remove(tag)
+//            else logsToShow.add(tag)
+//            updateLogs()
+        }
+        binding.spinnerUser.adapter = userAdapter
+
+        // For different tags
+        val logTags = applicationContext.resources.getStringArray(R.array.logs_tag)
+        val tagsCategoryList: ArrayList<SpinnerModel> = ArrayList()
+        for (tag in logTags) {
+            val categoryModel = SpinnerModel()
+            categoryModel.setTitle(tag)
+//            logsToShow.add(tag)
+            categoryModel.setSelected(true)
+            tagsCategoryList.add(categoryModel)
+        }
+        val tagAdapter = SpinnerAdapter(this@LogViewerActivity, tagsCategoryList) { position ->
+            val tag: String = logTags[position - 1]
+//            if (logsToShow.contains(tag)) logsToShow.remove(tag)
+//            else logsToShow.add(tag)
+//            updateLogs()
+        }
+        binding.spinnerTags.adapter = tagAdapter
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -190,7 +234,7 @@ class LogViewerActivity : AppCompatActivity() {
     }
 
     private suspend fun streamingLog() = withContext(Dispatchers.IO) {
-        val builder = ProcessBuilder().command("logcat", "all", "threadtime")
+        val builder = ProcessBuilder().command("logcat", "-b", "all", "-v", "threadtime", "*:V")
         builder.environment()["LC_ALL"] = "C"
         var process: Process? = null
         try {
@@ -247,10 +291,12 @@ class LogViewerActivity : AppCompatActivity() {
                         posStart -= numToRemove
 
                     }
-                    for (bufferedLine in bufferedLogLines) {
-                        if (TAG.compareTo(bufferedLine.tag) == 0 || bufferedLine.level == "V")  // add tag or level for filtering here
-                            logLines.addLast(bufferedLine)
-                    }
+                    for (bufferedLine in bufferedLogLines)
+                        when(bufferedLine.level){
+                            "V","I","E","W" ->{
+                                logLines.addLast(bufferedLine)
+                            }
+                        }
                     bufferedLogLines.clear()
                     logAdapter.notifyItemRangeInserted(posStart, logLines.size() - posStart)
                     posStart = logLines.size()
@@ -385,7 +431,7 @@ class LogViewerActivity : AppCompatActivity() {
                     android.provider.OpenableColumns.SIZE
                 ), 1
             )
-            m.addRow(arrayOf("${Companion.appName}-log.txt", it.size.toLong()))
+            m.addRow(arrayOf("$appName-log.txt", it.size.toLong()))
             m
         }
 

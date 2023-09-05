@@ -12,6 +12,7 @@
     <!-- Status bar color. -->
     <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
     <!-- Customize your theme here. -->
+    <item name="colorOnContainer">@color/spinner_background_light</item>
   </style>
     <style name="Theme.BaseAndroid.NoActionBar">
         <item name="windowActionBar">false</item>

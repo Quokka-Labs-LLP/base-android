@@ -21,6 +21,9 @@
     <string name="create_downloads_file_error">Cannot create file in downloads directory</string>
     <string name="create_output_dir_error">Cannot create output directory</string>
     <string name="log_viewer">Log Viewer</string>
+    <string name="show_filters">Show filters</string>
+    <string name="sample">sample_data</string>
+    <string name="dropdown_icon">To expand or shorten menu</string>
 
 
 </resources>

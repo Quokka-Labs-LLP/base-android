@@ -5,18 +5,50 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <HorizontalScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:itemCount="20"
-            tools:listitem="@layout/log_viewer_entry" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Spinner
+                android:id="@+id/spinner_user"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="5dp"
+                android:spinnerMode="dropdown"
+                android:background="?attr/colorOnContainer"/>
+            <Spinner
+                android:id="@+id/spinner_tags"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="5dp"
+                android:spinnerMode="dropdown"
+                android:background="?attr/colorOnContainer"/>
 
-    </HorizontalScrollView>
+
+        </LinearLayout>
+
+
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:itemCount="20"
+                tools:listitem="@layout/log_viewer_entry" />
+
+        </HorizontalScrollView>
+    </LinearLayout>
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/share_fab"
