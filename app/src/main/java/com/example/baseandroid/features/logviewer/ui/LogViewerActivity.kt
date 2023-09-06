@@ -60,50 +60,21 @@ class LogViewerActivity : AppCompatActivity() {
     private var rawLogLines = CircularArray<String>()
     private var recyclerView: RecyclerView? = null
     private var saveButton: MenuItem? = null
-    private val year by lazy {
-        val yearFormatter: DateFormat = SimpleDateFormat("yyyy", Locale.US)
-        yearFormatter.format(Date())
-    }
-    private val appName by lazy { getString(R.string.app_name) }
-
-
-    private val debugColor by lazy {
-        ResourcesCompat.getColor(
-            resources, R.color.debug_tag_color, theme
-        )
-    }
-    private val defaultColor by lazy {
-        ResourcesCompat.getColor(
-            resources, R.color.default_color, theme
-        )
-    }
-
-    private val errorColor by lazy {
-        ResourcesCompat.getColor(
-            resources, R.color.error_tag_color, theme
-        )
-    }
-
-    private val infoColor by lazy {
-        ResourcesCompat.getColor(
-            resources, R.color.info_tag_color, theme
-        )
-    }
-
-    private val warningColor by lazy {
-        ResourcesCompat.getColor(
-            resources, R.color.warning_tag_color, theme
-        )
-    }
-
+    private lateinit var year: String
     private var lastUri: Uri? = null
+    private val logsToShow = ArrayList<String>()
+    private var totalLogs = 0
 
+    private fun init() {
+        val yearFormatter: DateFormat = SimpleDateFormat("yyyy", Locale.US)
+        year = yearFormatter.format(Date())
+        appName = getString(R.string.app_name)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        init()
         TAG = appName.plus("\\LogViewerActivity")
-
-        Companion.appName = appName
 
         binding = ActivityLogViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -117,7 +88,7 @@ class LogViewerActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch(Dispatchers.IO) { streamingLog() }
-        Log.i(TAG, "onCreate: ")
+        Log.i(TAG, "in onCreate")
 
         binding.shareFab.setOnClickListener {
             lifecycleScope.launch {
@@ -148,14 +119,14 @@ class LogViewerActivity : AppCompatActivity() {
             val categoryModel = SpinnerModel()
             categoryModel.setTitle(user)
             categoryModel.setSelected(true)
-//            logsToShow.add(user)
+            logsToShow.add(user)
             userCategoryList.add(categoryModel)
         }
         val userAdapter = SpinnerAdapter(this@LogViewerActivity, userCategoryList) { position ->
-            val tag: String = userTags[position - 1]
-//            if (logsToShow.contains(tag)) logsToShow.remove(tag)
-//            else logsToShow.add(tag)
-//            updateLogs()
+            val title = userCategoryList[position].getTitle()
+            if (logsToShow.contains(title)) logsToShow.remove(title)
+            else logsToShow.add(title)
+            logAdapter.updateList()
         }
         binding.spinnerUser.adapter = userAdapter
 
@@ -165,19 +136,18 @@ class LogViewerActivity : AppCompatActivity() {
         for (tag in logTags) {
             val categoryModel = SpinnerModel()
             categoryModel.setTitle(tag)
-//            logsToShow.add(tag)
+            logsToShow.add(tag)
             categoryModel.setSelected(true)
             tagsCategoryList.add(categoryModel)
         }
         val tagAdapter = SpinnerAdapter(this@LogViewerActivity, tagsCategoryList) { position ->
-            val tag: String = logTags[position - 1]
-//            if (logsToShow.contains(tag)) logsToShow.remove(tag)
-//            else logsToShow.add(tag)
-//            updateLogs()
+            val title = tagsCategoryList[position].getTitle()
+            if (logsToShow.contains(title)) logsToShow.remove(title)
+            else logsToShow.add(title)
+            logAdapter.updateList()
         }
         binding.spinnerTags.adapter = tagAdapter
-
-
+        totalLogs = logsToShow.size
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -293,7 +263,7 @@ class LogViewerActivity : AppCompatActivity() {
                     }
                     for (bufferedLine in bufferedLogLines)
                         when(bufferedLine.level){
-                            "V","I","E","W" ->{
+                            "V","D","I","E","W" ->{
                                 logLines.addLast(bufferedLine)
                             }
                         }
@@ -359,6 +329,40 @@ class LogViewerActivity : AppCompatActivity() {
     }
 
     private inner class LogEntryAdapter : RecyclerView.Adapter<LogEntryAdapter.ViewHolder>() {
+        private var logsList = CircularArray<LogLine>()
+        private val debugColor by lazy {
+            ResourcesCompat.getColor(
+                resources, R.color.debug_tag_color, theme
+            )
+        }
+
+        private val defaultColor by lazy {
+            ResourcesCompat.getColor(
+                resources, R.color.default_color, theme
+            )
+        }
+
+        private val errorColor by lazy {
+            ResourcesCompat.getColor(
+                resources, R.color.error_tag_color, theme
+            )
+        }
+
+        private val infoColor by lazy {
+            ResourcesCompat.getColor(
+                resources, R.color.info_tag_color, theme
+            )
+        }
+
+        private val warningColor by lazy {
+            ResourcesCompat.getColor(
+                resources, R.color.warning_tag_color, theme
+            )
+        }
+
+        init {
+            logsList = logLines
+        }
 
         private inner class ViewHolder(val layout: View, var isSingleLine: Boolean = true) :
             RecyclerView.ViewHolder(layout)
@@ -373,7 +377,7 @@ class LogViewerActivity : AppCompatActivity() {
             }
         }
 
-        override fun getItemCount() = logLines.size()
+        override fun getItemCount() = logsList.size()
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
@@ -382,9 +386,9 @@ class LogViewerActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val line = logLines[position]
+            val line = logsList[position]
             val spannable =
-                if (position > 0 && logLines[position - 1].tag == line.tag) SpannableString(line.msg)
+                if (position > 0 && logsList[position - 1].tag == line.tag) SpannableString(line.msg)
                 else SpannableString("${line.tag}: ${line.msg}").apply {
                     setSpan(
                         StyleSpan(BOLD),
@@ -393,8 +397,7 @@ class LogViewerActivity : AppCompatActivity() {
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                     )
                     setSpan(
-                        ForegroundColorSpan(levelToColor(line.level)),
-                        0,
+                        ForegroundColorSpan(levelToColor(line.level)), 0,
                         "${line.tag}:".length,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                     )
@@ -410,6 +413,21 @@ class LogViewerActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+
+        fun updateList() {
+            when {
+                logsToShow.size == totalLogs -> logsList = logLines
+                logsToShow.isEmpty() -> logsList.clear()
+                else -> {
+                    for (i in 0 until logLines.size()) {
+                        if (logsToShow.contains(logLines[i].tag)) {
+                            logsList.addLast(logLines[i])
+                        }
+                    }
+                }
+            }
+            notifyDataSetChanged()
         }
     }
 

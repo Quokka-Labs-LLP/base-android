@@ -39,20 +39,20 @@ class SpinnerAdapter(
                 binding.spinnerText.setTypeface(null, Typeface.BOLD)
             }
         }
-//        if (position > 0) binding.root.setOnClickListener {
-//            if (binding.spinnerCheckbox.isChecked) {
-//                binding.spinnerCheckbox.isChecked = false
-//                tag.setSelected(false)
-//            } else {
-//                binding.spinnerCheckbox.isChecked = true
-//                tag.setSelected(true)
-//            }
-//            callOnClick(position)
-//        }
-//        if (position == 1) {
-//            binding.spinnerCheckbox.isChecked = true
-//            tag.setSelected(true)
-//        }
+        if (position > 0) binding.root.setOnClickListener {
+            if (binding.spinnerCheckbox.isChecked) {
+                binding.spinnerCheckbox.isChecked = false
+                tag.setSelected(false)
+            } else {
+                binding.spinnerCheckbox.isChecked = true
+                tag.setSelected(true)
+            }
+            callOnClick(position)
+        }
+        if (position == 1) {
+            binding.spinnerCheckbox.isChecked = true
+            tag.setSelected(true)
+        }
 
         return view
     }

@@ -2,7 +2,7 @@ package com.example.baseandroid.features.logviewer.model
 
 class SpinnerModel {
     private var selected = false
-    private var title: String? = null
+    private var title: String = ""
 
     fun isSelected(): Boolean {
         return selected
@@ -12,11 +12,11 @@ class SpinnerModel {
         this.selected = selected
     }
 
-    fun getTitle(): String? {
+    fun getTitle(): String {
         return title
     }
 
-    fun setTitle(title: String?) {
+    fun setTitle(title: String) {
         this.title = title
     }
 
