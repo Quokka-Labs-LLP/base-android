@@ -1,6 +1,8 @@
 package com.example.baseandroid.features.logviewer.ui
 
+import android.content.ClipData
 import android.content.ClipDescription.compareMimeTypes
+import android.content.ClipboardManager
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.Intent
@@ -21,6 +23,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.collection.CircularArray
 import androidx.core.content.res.ResourcesCompat
@@ -30,11 +33,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.baseandroid.R
 import com.example.baseandroid.databinding.ActivityLogViewerBinding
-import com.example.baseandroid.features.logviewer.adapter.SpinnerAdapter
-import com.example.baseandroid.features.logviewer.model.SpinnerModel
+import com.example.baseandroid.databinding.FilterSheetBinding
 import com.example.baseandroid.utils.logviewer.DownloadsFileSaver
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
@@ -56,16 +60,25 @@ class LogViewerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLogViewerBinding
     private lateinit var logAdapter: LogEntryAdapter
-    private var logLines = CircularArray<LogLine>()
+    private var verboseLogLines = CircularArray<LogLine>()
+    private var debugLogLines = CircularArray<LogLine>()
+    private var infoLogLines = CircularArray<LogLine>()
+    private var warningLogLines = CircularArray<LogLine>()
+    private var errorLogLines = CircularArray<LogLine>()
+    private var adapterLocalList = CircularArray<LogLine>()
     private var rawLogLines = CircularArray<String>()
     private var recyclerView: RecyclerView? = null
-    private var saveButton: MenuItem? = null
     private lateinit var year: String
     private var lastUri: Uri? = null
-    private val logsToShow = ArrayList<String>()
-    private var totalLogs = 0
+    private var isFabsVisible = false
+    private lateinit var filterButton: MenuItem
+    private var currentTag = "V"
+    private var currentSource = "All"
+    private lateinit var bottomSheetDialog: BottomSheetDialog
 
     private fun init() {
+        bottomSheetDialog = BottomSheetDialog(this, R.style.BottomSheetDialogTheme)
+
         val yearFormatter: DateFormat = SimpleDateFormat("yyyy", Locale.US)
         year = yearFormatter.format(Date())
         appName = getString(R.string.app_name)
@@ -75,7 +88,6 @@ class LogViewerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         init()
         TAG = appName.plus("\\LogViewerActivity")
-
         binding = ActivityLogViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -90,7 +102,53 @@ class LogViewerActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) { streamingLog() }
         Log.i(TAG, "in onCreate")
 
+        binding.extendFab.shrink()
+        binding.extendFab.setOnClickListener {
+            if (!isFabsVisible) {
+                makeFabsVisible(true)
+                isFabsVisible = true
+                binding.extendFab.extend()
+                binding.extendFab.icon =
+                    ResourcesCompat.getDrawable(resources, R.drawable.ic_less_actions, null)
+            } else {
+                makeFabsVisible(false)
+                isFabsVisible = false
+                binding.extendFab.shrink()
+                binding.extendFab.icon =
+                    ResourcesCompat.getDrawable(resources, R.drawable.ic_more_actions, null)
+            }
+        }
+
+        binding.saveFab.setOnClickListener {
+            binding.extendFab.callOnClick()
+            lifecycleScope.launch { saveLog() }
+            Toast.makeText(this, "Logs Saved", Toast.LENGTH_LONG).show()
+        }
+        binding.deleteFab.setOnClickListener {
+            binding.extendFab.callOnClick()
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Delete Logs?")
+            builder.setMessage("Do you want to clear the logs?")
+            builder.setPositiveButton("Yes", null)
+            builder.setNegativeButton("No", null)
+            val alertDialog: AlertDialog = builder.create()
+            alertDialog.setCancelable(false)
+            alertDialog.show()
+
+            val mPositiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            mPositiveButton.setOnClickListener {
+                alertDialog.cancel()
+                clearLogs()
+                Toast.makeText(this, "Logs Deleted", Toast.LENGTH_SHORT).show()
+            }
+            val mNegativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+            mNegativeButton.setOnClickListener {
+                alertDialog.cancel()
+            }
+        }
+
         binding.shareFab.setOnClickListener {
+            binding.extendFab.callOnClick()
             lifecycleScope.launch {
                 val f = SimpleDateFormat(
                     "yyyyMMdd", Locale.getDefault()
@@ -107,52 +165,101 @@ class LogViewerActivity : AppCompatActivity() {
 
             }
         }
-        configureSpinners()
     }
 
-    private fun configureSpinners() {
+    override fun onPause() {
+        bottomSheetDialog.cancel()
+        super.onPause()
+    }
 
-        // For user generated or system generated Logs
-        val userTags = applicationContext.resources.getStringArray(R.array.logs_user)
-        val userCategoryList: ArrayList<SpinnerModel> = ArrayList()
-        for (user in userTags) {
-            val categoryModel = SpinnerModel()
-            categoryModel.setTitle(user)
-            categoryModel.setSelected(true)
-            logsToShow.add(user)
-            userCategoryList.add(categoryModel)
+    private fun filterSheet() {
+        val bottomSheetBinding = FilterSheetBinding.inflate(layoutInflater, null, false)
+        bottomSheetDialog.setCancelable(true)
+        when (currentTag) {
+            "V" -> bottomSheetBinding.radioVerbose.isChecked = true
+            "D" -> bottomSheetBinding.radioDebug.isChecked = true
+            "I" -> bottomSheetBinding.radioInfo.isChecked = true
+            "W" -> bottomSheetBinding.radioWarning.isChecked = true
+            "E" -> bottomSheetBinding.radioError.isChecked = true
         }
-        val userAdapter = SpinnerAdapter(this@LogViewerActivity, userCategoryList) { position ->
-            val title = userCategoryList[position].getTitle()
-            if (logsToShow.contains(title)) logsToShow.remove(title)
-            else logsToShow.add(title)
-            logAdapter.updateList()
+        when (currentSource) {
+            "All" -> bottomSheetBinding.radioAll.isChecked = true
+            "User" -> bottomSheetBinding.radioUser.isChecked = true
+            "System" -> bottomSheetBinding.radioSystem.isChecked = true
         }
-        binding.spinnerUser.adapter = userAdapter
+        bottomSheetBinding.btnApply.setOnClickListener {
+            when (bottomSheetBinding.groupTags.checkedRadioButtonId) {
+                R.id.radio_verbose -> {
+                    currentTag = "V"
+                }
 
-        // For different tags
-        val logTags = applicationContext.resources.getStringArray(R.array.logs_tag)
-        val tagsCategoryList: ArrayList<SpinnerModel> = ArrayList()
-        for (tag in logTags) {
-            val categoryModel = SpinnerModel()
-            categoryModel.setTitle(tag)
-            logsToShow.add(tag)
-            categoryModel.setSelected(true)
-            tagsCategoryList.add(categoryModel)
+                R.id.radio_debug -> {
+                    currentTag = "D"
+                }
+
+                R.id.radio_info -> {
+                    currentTag = "I"
+                }
+
+                R.id.radio_warning -> {
+                    currentTag = "W"
+                }
+
+                R.id.radio_error -> {
+                    currentTag = "E"
+                }
+            }
+            when (bottomSheetBinding.groupSources.checkedRadioButtonId) {
+                R.id.radio_all -> {
+                    currentSource = "All"
+                }
+
+                R.id.radio_user -> {
+                    currentSource = "User"
+                }
+
+                R.id.radio_system -> {
+                    currentSource = "System"
+                }
+            }
+            logAdapter.updateList(currentTag, currentSource)
+            bottomSheetDialog.cancel()
         }
-        val tagAdapter = SpinnerAdapter(this@LogViewerActivity, tagsCategoryList) { position ->
-            val title = tagsCategoryList[position].getTitle()
-            if (logsToShow.contains(title)) logsToShow.remove(title)
-            else logsToShow.add(title)
-            logAdapter.updateList()
+        bottomSheetBinding.tvClear.setOnClickListener {
+            bottomSheetBinding.groupTags.check(R.id.radio_verbose)
+            bottomSheetBinding.groupSources.check(R.id.radio_all)
         }
-        binding.spinnerTags.adapter = tagAdapter
-        totalLogs = logsToShow.size
+        bottomSheetDialog.setContentView(bottomSheetBinding.root)
+        bottomSheetDialog.show()
+    }
+
+    private fun clearLogs() {
+        logAdapter = LogEntryAdapter()
+        verboseLogLines.clear()
+        debugLogLines.clear()
+        infoLogLines.clear()
+        warningLogLines.clear()
+        errorLogLines.clear()
+        adapterLocalList.clear()
+        rawLogLines.clear()
+        recyclerView?.adapter = logAdapter
+    }
+
+    private fun makeFabsVisible(makeVisible: Boolean) {
+        if (makeVisible) {
+            binding.deleteFab.visibility = View.VISIBLE
+            binding.shareFab.visibility = View.VISIBLE
+            binding.saveFab.visibility = View.VISIBLE
+        } else {
+            binding.deleteFab.visibility = View.GONE
+            binding.shareFab.visibility = View.GONE
+            binding.saveFab.visibility = View.GONE
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.log_viewer, menu)
-        saveButton = menu.findItem(R.id.save_log)
+        filterButton = menu.findItem(R.id.filter_log)
         return true
     }
 
@@ -163,10 +270,8 @@ class LogViewerActivity : AppCompatActivity() {
                 true
             }
 
-            R.id.save_log -> {
-                saveButton?.isEnabled = false
-                lifecycleScope.launch { saveLog() }
-                Toast.makeText(this, "Logs Saved", Toast.LENGTH_LONG).show()
+            R.id.filter_log -> {
+                filterSheet()
                 true
             }
 
@@ -197,9 +302,6 @@ class LogViewerActivity : AppCompatActivity() {
                 outputFile?.delete()
             }
         }
-        saveButton?.isEnabled = true
-        if (outputFile == null) return null
-
         return outputFile?.uri
     }
 
@@ -236,8 +338,8 @@ class LogViewerActivity : AppCompatActivity() {
                 } else {
                     if (bufferedLogLines.isNotEmpty()) {
                         bufferedLogLines.last().msg += "\n$line"
-                    } else if (!logLines.isEmpty) {
-                        logLines[logLines.size() - 1].msg += "\n$line"
+                    } else if (!verboseLogLines.isEmpty) {
+                        verboseLogLines[verboseLogLines.size() - 1].msg += "\n$line"
                         priorModified = true
                     }
                 }
@@ -253,26 +355,51 @@ class LogViewerActivity : AppCompatActivity() {
                         logAdapter.notifyItemChanged(posStart - 1)
                         priorModified = false
                     }
-                    val fullLen = logLines.size() + bufferedLogLines.size
+                    val fullLen = verboseLogLines.size() + bufferedLogLines.size
                     if (fullLen >= MAX_LINES) {
                         val numToRemove = fullLen - MAX_LINES + 1
-                        logLines.removeFromStart(numToRemove)
+                        verboseLogLines.removeFromStart(numToRemove)
                         logAdapter.notifyItemRangeRemoved(0, numToRemove)
                         posStart -= numToRemove
 
                     }
-                    for (bufferedLine in bufferedLogLines)
-                        when(bufferedLine.level){
-                            "V","D","I","E","W" ->{
-                                logLines.addLast(bufferedLine)
-                            }
+                    for (bufferedLine in bufferedLogLines) when (bufferedLine.level) {
+                        "V" -> {
+                            verboseLogLines.addLast(bufferedLine)
                         }
-                    bufferedLogLines.clear()
-                    logAdapter.notifyItemRangeInserted(posStart, logLines.size() - posStart)
-                    posStart = logLines.size()
 
-                    if (isScrolledToBottomAlready) {
-                        recyclerView?.scrollToPosition(logLines.size() - 1)
+                        "D" -> {
+                            verboseLogLines.addLast(bufferedLine)
+                            debugLogLines.addLast(bufferedLine)
+                        }
+
+                        "I" -> {
+                            verboseLogLines.addLast(bufferedLine)
+                            debugLogLines.addLast(bufferedLine)
+                            infoLogLines.addLast(bufferedLine)
+                        }
+
+                        "W" -> {
+                            verboseLogLines.addLast(bufferedLine)
+                            debugLogLines.addLast(bufferedLine)
+                            infoLogLines.addLast(bufferedLine)
+                            warningLogLines.addLast(bufferedLine)
+                        }
+
+                        "E" -> {
+                            verboseLogLines.addLast(bufferedLine)
+                            debugLogLines.addLast(bufferedLine)
+                            infoLogLines.addLast(bufferedLine)
+                            warningLogLines.addLast(bufferedLine)
+                            errorLogLines.addLast(bufferedLine)
+                        }
+                    }
+                    bufferedLogLines.clear()
+                    logAdapter.notifyItemRangeInserted(posStart, adapterLocalList.size() - posStart)
+                    posStart = adapterLocalList.size()
+
+                    if (isScrolledToBottomAlready && adapterLocalList.size() > 0) {
+                        recyclerView?.scrollToPosition(adapterLocalList.size() - 1)
                     }
                 }
             }
@@ -329,7 +456,6 @@ class LogViewerActivity : AppCompatActivity() {
     }
 
     private inner class LogEntryAdapter : RecyclerView.Adapter<LogEntryAdapter.ViewHolder>() {
-        private var logsList = CircularArray<LogLine>()
         private val debugColor by lazy {
             ResourcesCompat.getColor(
                 resources, R.color.debug_tag_color, theme
@@ -361,7 +487,7 @@ class LogViewerActivity : AppCompatActivity() {
         }
 
         init {
-            logsList = logLines
+            adapterLocalList = verboseLogLines
         }
 
         private inner class ViewHolder(val layout: View, var isSingleLine: Boolean = true) :
@@ -377,7 +503,7 @@ class LogViewerActivity : AppCompatActivity() {
             }
         }
 
-        override fun getItemCount() = logsList.size()
+        override fun getItemCount() = adapterLocalList.size()
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
@@ -386,9 +512,11 @@ class LogViewerActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val line = logsList[position]
+            val line = adapterLocalList[position]
             val spannable =
-                if (position > 0 && logsList[position - 1].tag == line.tag) SpannableString(line.msg)
+                if (position > 0 && adapterLocalList[position - 1].tag == line.tag) SpannableString(
+                    line.msg
+                )
                 else SpannableString("${line.tag}: ${line.msg}").apply {
                     setSpan(
                         StyleSpan(BOLD),
@@ -397,7 +525,8 @@ class LogViewerActivity : AppCompatActivity() {
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                     )
                     setSpan(
-                        ForegroundColorSpan(levelToColor(line.level)), 0,
+                        ForegroundColorSpan(levelToColor(line.level)),
+                        0,
                         "${line.tag}:".length,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                     )
@@ -412,22 +541,64 @@ class LogViewerActivity : AppCompatActivity() {
                         holder.isSingleLine = !holder.isSingleLine
                     }
                 }
+                this.setOnLongClickListener {
+                    val clipboard: ClipboardManager =
+                        getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("log", "${line.tag}: ${line.msg}")
+                    clipboard.setPrimaryClip(clip)
+                    true
+                }
             }
         }
 
-        fun updateList() {
-            when {
-                logsToShow.size == totalLogs -> logsList = logLines
-                logsToShow.isEmpty() -> logsList.clear()
-                else -> {
-                    for (i in 0 until logLines.size()) {
-                        if (logsToShow.contains(logLines[i].tag)) {
-                            logsList.addLast(logLines[i])
-                        }
+        fun updateList(tag: String, source: String) {
+            when (tag) {
+                "V" -> {
+                    adapterLocalList = verboseLogLines
+                }
+
+                "D" -> {
+                    adapterLocalList = debugLogLines
+                }
+
+                "I" -> {
+                    adapterLocalList = infoLogLines
+                }
+
+                "W" -> {
+                    adapterLocalList = warningLogLines
+                }
+
+                "E" -> {
+                    adapterLocalList = errorLogLines
+                }
+            }
+            val tempList = CircularArray<LogLine>()
+            when (source) {
+                "User" -> {
+                    for (i in 0 until adapterLocalList.size()) {
+                        if (adapterLocalList[i].tag == TAG)
+                            tempList.addLast(adapterLocalList[i])
                     }
+                    adapterLocalList = tempList
+                }
+
+                "System" -> {
+                    for (i in 0 until adapterLocalList.size()) {
+                        if (adapterLocalList[i].tag != TAG)
+                            tempList.addLast(adapterLocalList[i])
+                    }
+                    adapterLocalList = tempList
+                }
+
+                else -> {
                 }
             }
             notifyDataSetChanged()
+            lifecycleScope.launch {
+                delay(500)
+                if (adapterLocalList.size() > 0) recyclerView?.scrollToPosition(adapterLocalList.size() - 1)
+            }
         }
     }
 

@@ -24,6 +24,8 @@
     <string name="show_filters">Show filters</string>
     <string name="sample">sample_data</string>
     <string name="dropdown_icon">To expand or shorten menu</string>
+    <string name="text_actions">Options</string>
+    <string name="text_tags">TAGS</string>
 
 
 </resources>
