@@ -53,7 +53,6 @@ class SpinnerAdapter(
             binding.spinnerCheckbox.isChecked = true
             tag.setSelected(true)
         }
-
         return view
     }
 }
