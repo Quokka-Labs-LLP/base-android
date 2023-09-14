@@ -72,13 +72,13 @@ class LogViewerActivity : AppCompatActivity() {
     private var lastUri: Uri? = null
     private var isFabsVisible = false
     private lateinit var filterButton: MenuItem
-    private var currentTag = "V"
-    private var currentSource = "All"
+    private var currentLevel = "V"
+    private var currentTag = "All"
+    private var downloadFileName = ""
     private lateinit var bottomSheetDialog: BottomSheetDialog
 
     private fun init() {
         bottomSheetDialog = BottomSheetDialog(this, R.style.BottomSheetDialogTheme)
-
         val yearFormatter: DateFormat = SimpleDateFormat("yyyy", Locale.US)
         year = yearFormatter.format(Date())
         appName = getString(R.string.app_name)
@@ -175,14 +175,14 @@ class LogViewerActivity : AppCompatActivity() {
     private fun filterSheet() {
         val bottomSheetBinding = FilterSheetBinding.inflate(layoutInflater, null, false)
         bottomSheetDialog.setCancelable(true)
-        when (currentTag) {
+        when (currentLevel) {
             "V" -> bottomSheetBinding.radioVerbose.isChecked = true
             "D" -> bottomSheetBinding.radioDebug.isChecked = true
             "I" -> bottomSheetBinding.radioInfo.isChecked = true
             "W" -> bottomSheetBinding.radioWarning.isChecked = true
             "E" -> bottomSheetBinding.radioError.isChecked = true
         }
-        when (currentSource) {
+        when (currentTag) {
             "All" -> bottomSheetBinding.radioAll.isChecked = true
             "User" -> bottomSheetBinding.radioUser.isChecked = true
             "System" -> bottomSheetBinding.radioSystem.isChecked = true
@@ -190,39 +190,47 @@ class LogViewerActivity : AppCompatActivity() {
         bottomSheetBinding.btnApply.setOnClickListener {
             when (bottomSheetBinding.groupTags.checkedRadioButtonId) {
                 R.id.radio_verbose -> {
-                    currentTag = "V"
+                    currentLevel = "V"
+                    downloadFileName += "(V"
                 }
 
                 R.id.radio_debug -> {
-                    currentTag = "D"
+                    currentLevel = "D"
+                    downloadFileName += "(D"
                 }
 
                 R.id.radio_info -> {
-                    currentTag = "I"
+                    currentLevel = "I"
+                    downloadFileName += "(I"
                 }
 
                 R.id.radio_warning -> {
-                    currentTag = "W"
+                    currentLevel = "W"
+                    downloadFileName += "(W"
                 }
 
                 R.id.radio_error -> {
-                    currentTag = "E"
+                    currentLevel = "E"
+                    downloadFileName += "(E"
                 }
             }
             when (bottomSheetBinding.groupSources.checkedRadioButtonId) {
                 R.id.radio_all -> {
-                    currentSource = "All"
+                    currentTag = "All"
+                    downloadFileName += ",All)"
                 }
 
                 R.id.radio_user -> {
-                    currentSource = "User"
+                    currentTag = "User"
+                    downloadFileName += ",User)"
                 }
 
                 R.id.radio_system -> {
-                    currentSource = "System"
+                    currentTag = "System"
+                    downloadFileName += ",System)"
                 }
             }
-            logAdapter.updateList(currentTag, currentSource)
+            logAdapter.updateList(currentLevel, currentTag)
             bottomSheetDialog.cancel()
         }
         bottomSheetBinding.tvClear.setOnClickListener {
@@ -285,10 +293,20 @@ class LogViewerActivity : AppCompatActivity() {
         val builder = StringBuilder()
         withContext(Dispatchers.IO) {
             for (i in 0 until rawLogLines.size()) {
-                builder.append(rawLogLines[i])
-                builder.append('\n')
+                val currentLog = parseLine(rawLogLines[i])
+                if (currentLog?.level == currentLevel) {
+                    when (currentTag) {
+                        "All" -> builder.append(rawLogLines[i])
+                        "User" -> if (currentLog.tag.compareTo(TAG) == 0) builder.append(rawLogLines[i])
+                        "System" -> if (currentLog.tag.compareTo(TAG) != 0) builder.append(
+                            rawLogLines[i]
+                        )
+                    }
+                    builder.append('\n')
+                }
             }
         }
+        downloadFileName = ""
         return builder.toString().toByteArray(Charsets.UTF_8)
     }
 
@@ -296,7 +314,11 @@ class LogViewerActivity : AppCompatActivity() {
         var outputFile: DownloadsFileSaver.DownloadsFile? = null
         withContext(Dispatchers.IO) {
             try {
-                outputFile = downloadsFileSaver.save("${appName}-log.txt", "text/plain", true)
+                outputFile = downloadsFileSaver.save(
+                    "${appName + downloadFileName}-log.txt",
+                    "text/plain",
+                    true
+                )
                 outputFile?.outputStream?.write(rawLogBytes())
             } catch (e: Throwable) {
                 outputFile?.delete()
@@ -582,7 +604,6 @@ class LogViewerActivity : AppCompatActivity() {
                     }
                     adapterLocalList = tempList
                 }
-
                 "System" -> {
                     for (i in 0 until adapterLocalList.size()) {
                         if (adapterLocalList[i].tag != TAG)
@@ -590,7 +611,6 @@ class LogViewerActivity : AppCompatActivity() {
                     }
                     adapterLocalList = tempList
                 }
-
                 else -> {
                 }
             }
