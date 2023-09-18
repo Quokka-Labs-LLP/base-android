@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.flowOn
 
 class MainRepository(private val apiInterface: ApiInterface) : BaseApiResponse() {
     suspend fun getAllUsers(): Flow<NetworkResult<List<UserResponse>>> {
-        return flow<NetworkResult<List<UserResponse>>> {
+        return flow {
             emit(safeApiCall { apiInterface.getAllUsers() })
         }.flowOn(Dispatchers.IO)
     }
