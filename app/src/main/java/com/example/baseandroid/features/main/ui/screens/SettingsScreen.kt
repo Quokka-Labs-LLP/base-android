@@ -1,6 +1,8 @@
 package com.example.baseandroid.features.main.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.chuckerteam.chucker.api.Chucker
+import com.example.baseandroid.features.logviewer.ui.LogViewerActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,14 +54,26 @@ fun SettingsScreen(modifier: Modifier, navController: NavController) {
         Surface(
             modifier = Modifier.padding(it), color = MaterialTheme.colorScheme.background
         ) {
-            Button(
-                onClick = {
-                    context.startActivity(Chucker.getLaunchIntent(context))
-                }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
-            ) {
-                Text(text = "Launch Chucker")
+            Column {
+                Button(
+                    onClick = {
+                        context.startActivity(Chucker.getLaunchIntent(context))
+                    }, modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                ) {
+                    Text(text = "Launch Chucker")
+                }
+                Button(
+                    onClick = {
+                        context.startActivity(Intent(context, LogViewerActivity::class.java))
+                    }, modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                ) {
+                    Text(text = "Launch Log Viewer")
+                }
+
             }
 
         }
