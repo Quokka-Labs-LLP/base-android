@@ -28,9 +28,8 @@ import com.example.baseandroid.navigation.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(modifier: Modifier, userList: List<UserResponse>, navController: NavController) {
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-        TopAppBar(
-            colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+    Scaffold(modifier = modifier, topBar = {
+        TopAppBar(colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
             title = {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,

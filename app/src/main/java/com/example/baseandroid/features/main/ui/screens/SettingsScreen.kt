@@ -1,6 +1,8 @@
 package com.example.baseandroid.features.main.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,8 +31,7 @@ import com.chuckerteam.chucker.api.Chucker
 fun SettingsScreen(modifier: Modifier, navController: NavController) {
     val context = LocalContext.current
     Scaffold(modifier = modifier, topBar = {
-        TopAppBar(
-            colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+        TopAppBar(colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
             title = {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -52,14 +53,26 @@ fun SettingsScreen(modifier: Modifier, navController: NavController) {
         Surface(
             modifier = Modifier.padding(it), color = MaterialTheme.colorScheme.background
         ) {
-            Button(
-                onClick = {
-                    context.startActivity(Chucker.getLaunchIntent(context))
-                }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
-            ) {
-                Text(text = "Launch Chucker")
+            Column {
+                Button(
+                    onClick = {
+                        context.startActivity(Chucker.getLaunchIntent(context))
+                    }, modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                ) {
+                    Text(text = "Launch Chucker")
+                }
+                Button(
+                    onClick = {
+                        context.startActivity(Intent(context, LogViewerActivity::class.java))
+                    }, modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                ) {
+                    Text(text = "Launch Log Viewer")
+                }
+
             }
 
         }
