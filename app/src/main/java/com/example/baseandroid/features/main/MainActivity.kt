@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -17,11 +16,10 @@ import com.example.baseandroid.features.main.viewmodel.MainViewModel
 import com.example.baseandroid.navigation.SetNavGraph
 import com.example.baseandroid.utils.NetworkResult
 import com.example.baseandroid.utils.NetworkUtils
-import dagger.hilt.android.AndroidEntryPoint
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val mainViewModel by viewModels<MainViewModel>()
+    private val mainViewModel by viewModel<MainViewModel>()
     private val userList = mutableStateOf(listOf<UserResponse>())
     private lateinit var navController: NavHostController
 
@@ -57,11 +55,9 @@ class MainActivity : ComponentActivity() {
                     }
 
                     is NetworkResult.Loading -> {
-                        //show a progress bar
+                        // show a progress bar
                     }
-
                 }
-
             }
         } else Toast.makeText(this, getString(R.string.check_internet), Toast.LENGTH_LONG).show()
     }

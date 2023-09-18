@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.chuckerteam.chucker.api.Chucker
+import com.example.baseandroid.features.logviewer.ui.LogViewerActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
