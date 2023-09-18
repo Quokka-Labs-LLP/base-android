@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <HorizontalScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            tools:itemCount="20"
+            tools:listitem="@layout/log_viewer_entry" />
+
+    </HorizontalScrollView>
+
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/extend_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:text="@string/text_actions"
+        app:icon="@drawable/ic_more_actions"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/delete_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginVertical="15dp"
+        android:contentDescription="Delete"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/extend_fab"
+        app:layout_constraintEnd_toEndOf="@id/extend_fab"
+        app:srcCompat="@drawable/ic_delete" />
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/share_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginVertical="15dp"
+        android:contentDescription="Share"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/delete_fab"
+        app:layout_constraintEnd_toEndOf="@id/extend_fab"
+        app:srcCompat="@drawable/ic_action_share_white" />
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/save_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginVertical="15dp"
+        android:contentDescription="Save"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/share_fab"
+        app:layout_constraintEnd_toEndOf="@id/extend_fab"
+        app:srcCompat="@drawable/ic_action_save" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

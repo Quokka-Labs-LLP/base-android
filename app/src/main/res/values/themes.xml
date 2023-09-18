@@ -12,6 +12,7 @@
     <!-- Status bar color. -->
     <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
     <!-- Customize your theme here. -->
+    <item name="colorOnContainer">@color/spinner_background_light</item>
   </style>
     <style name="Theme.BaseAndroid.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -19,4 +20,19 @@
     </style>
     <style name="Theme.BaseAndroid.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="Theme.BaseAndroid.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+  <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
+    <item name="android:typeface">monospace</item>
+    <item name="android:background">@drawable/corner_circle</item>
+  </style>
+
+  <style name="BaseBottomSheetDialog" parent="@style/Theme.Design.Light.BottomSheetDialog">
+    <item name="android:windowIsFloating">false</item>
+    <item name="android:typeface">monospace</item>
+    <item name="bottomSheetStyle">@style/BottomSheet</item>
+  </style>
+
+  <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog" />
+
 </resources>
