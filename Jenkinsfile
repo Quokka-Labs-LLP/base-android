@@ -1,5 +1,5 @@
 pipeline {
-    agent { 
+    agent {
         // # JENKINS AGENT (BUILD SERVER)
         label 'Jenkins-Agent-1_QL_DEV-Server'
     }
@@ -8,14 +8,14 @@ pipeline {
         // # Setting timeout option to abort the build automatically if the build get's stuck
         timeout(time: 45, unit: 'MINUTES')
     }
-    
+
     environment {
         SCANNER_HOME = tool 'SonarQubeScanner-V4.8.0.2856'
 
         WEBHOOK_URL = "https://quokkalabsllp.webhook.office.com/webhookb2/0790c749-18af-46ec-a453-e568cda0ba52@4821c368-51a8-493c-92ea-826dd01a89cc/JenkinsCI/00758520ae9745d3bb7f39673a7fc16b/05fbe5b2-8efd-4b4d-bf06-59990f3b2907"
-        COLOUR_SUCCCESS = "#7B83EB" //Medium Slate Blue 
+        COLOUR_SUCCCESS = "#7B83EB" //Medium Slate Blue
         COLOUR_FAILURE = "#FFB316" //Spanish Yellow
-        
+
         WDIR = "/jenkins-pipelines/${JOB_NAME}"
         BRANCHH = "development"
         TARGET_BRANCHH = "${CHANGE_TARGET}"
@@ -125,7 +125,7 @@ pipeline {
 
             script {
                 if ("${TARGET_BRANCHH}" == "${BRANCHH}") {
-                    // # Sends out the notification to MSTeams channel about the build 
+                    // # Sends out the notification to MSTeams channel about the build
                     office365ConnectorSend webhookUrl: "${WEBHOOK_URL}",
                         color : "${COLOUR_SUCCCESS}",
                         status: "${currentBuild.currentResult}",
@@ -137,12 +137,12 @@ pipeline {
             }
 
             // # Sends out the notification through e-mails about the build
-            //emailext to: 'ananda.yashaswi@quokkalabs.com, prem.shankar@quokkalabs.com, shashank.tripathi@quokkalabs.com, nisha.rana@quokkalabs.com', 
+            //emailext to: 'ananda.yashaswi@quokkalabs.com, prem.shankar@quokkalabs.com, shashank.tripathi@quokkalabs.com, nisha.rana@quokkalabs.com',
                      // to: 'techteam@quokkalabs.com',
                      // recipientProviders: [buildUser(), contributor(), developers(), requestor(), upstreamDevelopers()],
-                     //subject: "Jenkins build for ${env.JOB_NAME} is ${currentBuild.currentResult}", 
-                     //body:  "Jenkins build for the Job - ${env.JOB_NAME} is ${currentBuild.currentResult}. \n <br> More Info can be found here - ${env.BUILD_URL}", 
-                     //attachLog: false  
+                     //subject: "Jenkins build for ${env.JOB_NAME} is ${currentBuild.currentResult}",
+                     //body:  "Jenkins build for the Job - ${env.JOB_NAME} is ${currentBuild.currentResult}. \n <br> More Info can be found here - ${env.BUILD_URL}",
+                     //attachLog: false
         }
 
         // # Executes below commands in JENKINS AGENT (DEPLOYMENT SERVER) if build success
@@ -153,10 +153,10 @@ pipeline {
             script {
                 sh "rm -rf ${WDIR}"
             }
-    
+
             script {
                 if ("${TARGET_BRANCHH}" == "${BRANCHH}") {
-                    // # Sends out the notification to MSTeams channel about the build 
+                    // # Sends out the notification to MSTeams channel about the build
                     office365ConnectorSend webhookUrl: "${WEBHOOK_URL}",
                         color : "${COLOUR_FAILURE}",
                         status: "${currentBuild.currentResult}",
@@ -166,15 +166,15 @@ pipeline {
                     sh 'echo "Teams Notification cannot not be sent as PR target branch mismatch"'
                 }
             }
-            
+
             // # Sends out the notification through e-mails about the build
             //emailext to: 'ananda.yashaswi@quokkalabs.com, prem.shankar@quokkalabs.com, shashank.tripathi@quokkalabs.com, nisha.rana@quokkalabs.com',
-                     // to: 'ananda.yashaswi@quokkalabs.com, automation@quokkalabs.com',                     
+                     // to: 'ananda.yashaswi@quokkalabs.com, automation@quokkalabs.com',
                      // recipientProviders: [buildUser(), contributor(), culprits(), previous(), developers(), requestor(), brokenBuildSuspects(), brokenTestsSuspects(), upstreamDevelopers()],
-                     //subject: "Jenkins build for ${env.JOB_NAME} is ${currentBuild.currentResult}", 
-                     //body: "Jenkins build for the Job - ${env.JOB_NAME} is ${currentBuild.currentResult}. \n <br> More Info can be found here - ${env.BUILD_URL}", 
+                     //subject: "Jenkins build for ${env.JOB_NAME} is ${currentBuild.currentResult}",
+                     //body: "Jenkins build for the Job - ${env.JOB_NAME} is ${currentBuild.currentResult}. \n <br> More Info can be found here - ${env.BUILD_URL}",
                      //attachLog: true
-       } 
+       }
     }
 }
 
@@ -184,16 +184,16 @@ def targetbrachconfirm() {
 
     // Check if the pull request is coming from 'source-branch' to 'target-branch'
     //return sourceBranch == 'source-branch' && targetBranch == 'target-branch'
-    if (targetBranch == "development") {   
+    if (targetBranch == "development") {
         return targetBranch == "development"
     }
 
     else if (targetBranch == "staging") {
         return targetBranch == "staging"
-    }    
-    
+    }
+
     else {
         //return "Other Branches";
     }
-        
+
 }

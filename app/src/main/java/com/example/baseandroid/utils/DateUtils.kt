@@ -1,7 +1,9 @@
 package com.example.baseandroid.utils
 
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 object DateUtils {
@@ -15,7 +17,7 @@ object DateUtils {
         return dateFormat.format(date)
     }
 
-    fun parseDate(dateString: String, format: String): Date {
+    fun parseDate(dateString: String, format: String): Date? {
         val dateFormat = SimpleDateFormat(format, Locale.getDefault())
         return dateFormat.parse(dateString)
     }
